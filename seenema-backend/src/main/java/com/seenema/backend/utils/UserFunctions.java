@@ -9,6 +9,14 @@ import java.util.Map;
 
 public class UserFunctions {
 
+    /**
+     * Checks whether a user with the given username (email) exists in DynamoDB.
+     *
+     * @param username  the user's email address used as the DynamoDB partition key
+     * @param ddbClient the DynamoDB client instance
+     * @return {@code true} if the user exists
+     * @throws UserNotFoundException if no item is found for the given username
+     */
     public static boolean userExists(String username, DynamoDbClient ddbClient) {
         GetItemResponse getItemResponse = ddbClient.getItem(GetItemRequest.builder()
                 .tableName(Constants.DYNAMODB_TABLE)

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import {useEffect, useState} from "react"
 import CardRow from "./CardRow"
 import api from "./api"
 import '../css/MovieList.css'
@@ -79,7 +79,7 @@ const MovieList = () => {
             console.error('Failed to fetch now playing movies:', error);
         }
     };
-    // useEffect to call the fetch functions when the component mounts or searchTerm changes
+    // Re-run all fetches when the searchTerm route param changes
     useEffect(() => {
         setCurrentPage(1);
         fetchSearchMovies(1);
@@ -128,7 +128,7 @@ const MovieList = () => {
                     <h2 className="header-home">Upcoming Movies</h2>
                     <CardRow movies={upcomingMovies}/>
                     <h2 className="header-home">Popular Movies</h2>
-                    <CardRow movies={popularMovies}/>`
+                    <CardRow movies={popularMovies}/>
                 </>
             ) : (searchResults.length === 0) ? (
                 <>
@@ -150,7 +150,7 @@ const MovieList = () => {
                     {hasMoreResults && (
                         <div className="load-more-container-search-page">
                             <button onClick={handleLoadMore}
-                                    className="searhc-button-load-more button-load-more-search">
+                                    className="search-button-load-more button-load-more-search">
                                 Load More
                             </button>
                         </div>
