@@ -13,7 +13,7 @@ import NoMovieYet from "../../assets/NoDataYet.json";
 const MovieSuggestionList = () => {
     const navigate = useNavigate();
     const {user} = useContext(AuthContext);
-    const [suggestedMoviesList, setSuggestedMoviesList] = useState([]);
+    const [suggestedMoviesList, setSuggestedMoviesList] = useState(new Set());
     const [loading, setLoading] = useState(false);
 
     // Function to navigate back
@@ -40,12 +40,9 @@ const MovieSuggestionList = () => {
 
                 // Check if MovieSuggestionsList array exists before using map
                 if (userData.MovieSuggestionsList && Array.isArray(userData.MovieSuggestionsList)) {
-                    const suggestedMovieList = userData.MovieSuggestionsList.map((entry) => {
-                        const [movieId, suggestedBy] = entry.includes("|") ? entry.split("|") : [entry, null];
-                        return { movieId, suggestedBy };
-                    });
+                    const suggestedMovieList = userData.MovieSuggestionsList;
                     // Update the suggested movie list in the state
-                    setSuggestedMoviesList(suggestedMovieList);
+                    setSuggestedMoviesList(new Set(suggestedMovieList));
                 } else {
                     console.error("Invalid movies list data:", userData);
                 }
@@ -83,9 +80,9 @@ const MovieSuggestionList = () => {
                     </div>
                 ) : (
                     <div>
-                        {suggestedMoviesList.length > 0 ? (
+                        {suggestedMoviesList.size > 0 ? (
                             <ListOfMovies
-                                moviesList={suggestedMoviesList}
+                                moviesList={Array.from(suggestedMoviesList)}
                             />
                         ) : (
                             <div>

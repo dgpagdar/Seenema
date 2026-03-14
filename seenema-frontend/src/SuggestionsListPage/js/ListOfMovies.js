@@ -15,11 +15,11 @@ const ListOfMovies = ({moviesList}) => {
             try {
                 // Use Promise.all to concurrently fetch details for all movies
                 const moviesData = await Promise.all(
-                    moviesList.map(async ({ movieId, suggestedBy }) => {
+                    moviesList.map(async (movieId) => {
                         try {
                             // Fetch movie details using the API
                             const response = await api.get(`movie/${movieId}`);
-                            return { ...response.data, suggestedBy };
+                            return response.data;
                         } catch (error) {
                             // Log an error if fetching details for a movie fails
                             console.error(`Failed to fetch movie details for ID ${movieId}:`, error);
@@ -45,7 +45,7 @@ const ListOfMovies = ({moviesList}) => {
                 <div style={{width: '100%', overflow: 'auto', display: 'flex'}}>
                     <div className="movie-container-mylist">
                         {suggestedMoviesListMovies.map((movie) => (
-                            <MovieCard key={movie?.id} movie={movie} suggestedBy={movie?.suggestedBy}/>
+                            <MovieCard key={movie?.id} movie={movie}/>
                         ))}
                     </div>
                 </div>

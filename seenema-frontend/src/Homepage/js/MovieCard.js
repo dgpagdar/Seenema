@@ -6,7 +6,7 @@ import starImage from '../../assets/Star.png';
 import placeHolderImage from '../../assets/placeholderImage.png'
 
 // MovieCard component, taking movie object as a prop
-const MovieCard = ({movie, suggestedBy}) => {
+const MovieCard = ({movie}) => {
     // Creating URL for the movie poster
     const posterPath = movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : placeHolderImage;
 
@@ -30,9 +30,6 @@ const MovieCard = ({movie, suggestedBy}) => {
                 <span className="rating">{rating}</span>
                 <div className="year">{year}</div>
             </div>
-            {suggestedBy && (
-                <div className="suggested-by">Suggested by {suggestedBy}</div>
-            )}
         </div>
     );
 };
