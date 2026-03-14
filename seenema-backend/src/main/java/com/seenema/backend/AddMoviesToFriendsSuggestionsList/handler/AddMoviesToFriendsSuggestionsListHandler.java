@@ -32,8 +32,8 @@ public class AddMoviesToFriendsSuggestionsListHandler implements RequestHandler<
         if (userExists(requestBody.getUsername(), dynamoDbClient)
                 && userExists(requestBody.getFriendUsername(), dynamoDbClient)
                 && friendExists(requestBody.getUsername(), requestBody.getFriendUsername())) {
-            // Add  movie to friend's suggestions list (stored as "movieId|suggestedByUsername")
-            addMovieToFriendsSuggestionList(requestBody.getFriendUsername(), requestBody.getMovieId(), requestBody.getUsername());
+            // Add  movie to friend's suggestions list
+            addMovieToFriendsSuggestionList(requestBody.getFriendUsername(), requestBody.getMovieId());
 
             // Log success or handle response accordingly
             context.getLogger().log("Movie added to your friend's suggestion list successfully.");
@@ -69,13 +69,12 @@ public class AddMoviesToFriendsSuggestionsListHandler implements RequestHandler<
     }
 
     // Common function to add a friend for a user
-    private void addMovieToFriendsSuggestionList(String friendUsername, String movieId, String suggestedBy) {
+    private void addMovieToFriendsSuggestionList(String friendUsername, String movieId) {
         Map<String, AttributeValue> key = new HashMap<>();
         key.put("Email", AttributeValue.builder().s(friendUsername).build());
 
-        String entry = movieId + "|" + suggestedBy;
         Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":movie", AttributeValue.builder().ss(entry).build());
+        expressionAttributeValues.put(":movie", AttributeValue.builder().ss(movieId).build());
 
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                 .tableName(Constants.DYNAMODB_TABLE)
