@@ -9,8 +9,6 @@ import com.seenema.backend.AddFriend.model.Response;
 import com.seenema.backend.utils.Constants;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 import java.util.HashMap;
@@ -28,34 +26,31 @@ public class AddFriendHandler implements RequestHandler<APIGatewayV2HTTPEvent, R
     public Response handleRequest(APIGatewayV2HTTPEvent input, Context context) {
         RequestBody requestBody = gson.fromJson(input.getBody(), RequestBody.class);
 
-        // Check if both username and friendUsername exist
+        // Validate that both users exist before creating the friendship
         if (userExists(requestBody.getUsername(), dynamoDbClient)
                 && userExists(requestBody.getFriendUsername(), dynamoDbClient)) {
 
             // Add friend for the main user
             addFriend(requestBody.getUsername(), requestBody.getFriendUsername());
 
-            // Add reverse friendship for the friend
+            // Add reverse friendship to keep the relationship bidirectional
             addFriend(requestBody.getFriendUsername(), requestBody.getUsername());
 
-            // Log success or handle response accordingly
-            context.getLogger().log("Friend added successfully.");
+            context.getLogger().log(String.format("Friendship created between %s and %s.",
+                    requestBody.getUsername(), requestBody.getFriendUsername()));
 
-            // Return a response if needed
             return new Response("Friend added successfully.");
         } else {
-            context.getLogger().log("Either username or friendUsername does not exist in the DynamoDB table.");
+            context.getLogger().log(String.format("Failed to add friend: one or both users (%s, %s) not found.",
+                    requestBody.getUsername(), requestBody.getFriendUsername()));
             return new Response("Either username or friendUsername does not exist in the DynamoDB table.");
         }
     }
 
-    // Common function to add a friend for a user
+    // Appends friendUsername to the Friends set of the given user
     private void addFriend(String username, String friendUsername) {
         Map<String, AttributeValue> key = new HashMap<>();
         key.put("Email", AttributeValue.builder().s(username).build());
-
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":friend", AttributeValue.builder().ss(friendUsername).build());
 
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                 .tableName(Constants.DYNAMODB_TABLE)

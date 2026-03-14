@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class GetUserInfoHandler implements RequestHandler<APIGatewayV2HTTPEvent,
     @Override
     public String handleRequest(APIGatewayV2HTTPEvent input, Context context) {
         try {
-            // Assuming you've defined RequestBody and Response classes
             RequestBody requestBody = gson.fromJson(input.getBody(), RequestBody.class);
             String userEmail = requestBody.getEmail();
             Map<String, AttributeValue> key = new HashMap<>();
@@ -41,24 +39,20 @@ public class GetUserInfoHandler implements RequestHandler<APIGatewayV2HTTPEvent,
 
             if (response.hasItem()) {
                 Map<String, AttributeValue> item = response.item();
-                //TODO: Handle edge cases where Email, LastName and/or FirstName is not present
-                String Email = item.get("Email").s();
-                String LastName = item.get("LastName").s();
-                String FirstName = item.get("FirstName").s();
-                //TODO: Write tests for this when user doesn't have any friends or movies added
-                List<String> Friends = item.getOrDefault("Friends", AttributeValue.builder().ss().build()).ss();
-                List<String> Movies = item.getOrDefault("Movies", AttributeValue.builder().ss().build()).ss();
-                List<String> MovieSuggestionsList = item.getOrDefault("MovieSuggestionsList", AttributeValue.builder().ss().build()).ss();
+                String email = item.get("Email").s();
+                String lastName = item.get("LastName").s();
+                String firstName = item.get("FirstName").s();
+                List<String> friends = item.getOrDefault("Friends", AttributeValue.builder().ss().build()).ss();
+                List<String> movies = item.getOrDefault("Movies", AttributeValue.builder().ss().build()).ss();
+                List<String> movieSuggestionsList = item.getOrDefault("MovieSuggestionsList", AttributeValue.builder().ss().build()).ss();
 
-                // Assuming you have a constructor in the Response class
-                return gson.toJson(new Response(Email, LastName, FirstName, Friends, Movies, MovieSuggestionsList));
+                return gson.toJson(new Response(email, lastName, firstName, friends, movies, movieSuggestionsList));
             } else {
                 return gson.toJson(new Response("User not found"));
             }
 
         } catch (DynamoDbException e) {
-            context.getLogger().log("Error: " + e.getMessage());
-            // Assuming you have an error constructor in the Response class
+            context.getLogger().log("DynamoDB error while fetching user info: " + e.getMessage());
             return gson.toJson(new Response("Error retrieving user information"));
         }
     }

@@ -64,21 +64,19 @@ public class GetUserInfoHandlerTest {
     }
 
     @Test
-    public void testHandleRequest() {
-        // Create a sample valid APIGatewayV2HTTPEvent
+    public void testHandleRequest_userExists_returnsFullUserProfile() {
         APIGatewayV2HTTPEvent apiGatewayEvent = APIGatewayV2HTTPEvent.builder()
                 .withBody("{" +
                         "\"Email\": \"lpagdar@uw.edu\"" +
                         "}")
                 .build();
 
-        // Mock the Lambda context
         when(mockContext.getLogger()).thenReturn(mockLambdaLogger);
 
-        // Mock the DynamoDB client behavior
         when(mockDynamoDbClient.getItem(any(GetItemRequest.class)))
                 .thenReturn(GetItemResponse.builder()
-                        .item(Map.of("Email", AttributeValue.fromS("test@example.com"),
+                        .item(Map.of(
+                                "Email", AttributeValue.fromS("test@example.com"),
                                 "FirstName", AttributeValue.fromS("John"),
                                 "LastName", AttributeValue.fromS("Doe"),
                                 "Friends", AttributeValue.fromSs(List.of("Friend1", "Friend2", "Friend3")),
@@ -89,13 +87,12 @@ public class GetUserInfoHandlerTest {
         when(mockDynamoDbClient.updateItem(any(UpdateItemRequest.class)))
                 .thenReturn(UpdateItemResponse.builder().build());
 
-        // Call the handleRequest method
         String responseStr = getUserInfoHandler.handleRequest(apiGatewayEvent, mockContext);
         Response response = gson.fromJson(responseStr, Response.class);
 
-
-        // Assert the expected result based on your logic
-        assertEquals(response, new Response("test@example.com", "Doe", "John", List.of("Friend1", "Friend2", "Friend3"),
-                List.of("12345", "67891", "13425"), List.of("9876", "4657", "3333")));
+        assertEquals(response, new Response("test@example.com", "Doe", "John",
+                List.of("Friend1", "Friend2", "Friend3"),
+                List.of("12345", "67891", "13425"),
+                List.of("9876", "4657", "3333")));
     }
 }

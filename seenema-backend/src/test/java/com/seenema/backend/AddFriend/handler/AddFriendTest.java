@@ -61,8 +61,7 @@ public class AddFriendTest {
     }
 
     @Test
-    public void testHandleRequest() {
-        // Create a sample valid APIGatewayV2HTTPEvent
+    public void testHandleRequest_bothUsersExist_returnsFriendAddedResponse() {
         APIGatewayV2HTTPEvent apiGatewayEvent = APIGatewayV2HTTPEvent.builder()
                 .withBody("{" +
                         "\"username\": \"lpagdar@uw.edu\"," +
@@ -70,21 +69,18 @@ public class AddFriendTest {
                         "}")
                 .build();
 
-        // Mock the Lambda context
         when(mockContext.getLogger()).thenReturn(mockLambdaLogger);
 
-        // Mock the DynamoDB client behavior
+        // Both users exist in DynamoDB
         when(mockDynamoDbClient.getItem(any(GetItemRequest.class)))
                 .thenReturn(GetItemResponse.builder()
-                        .item(Map.of("test", AttributeValue.fromS("test")))
+                        .item(Map.of("Email", AttributeValue.fromS("lpagdar@uw.edu")))
                         .build());
         when(mockDynamoDbClient.updateItem(any(UpdateItemRequest.class)))
                 .thenReturn(UpdateItemResponse.builder().build());
 
-        // Call the handleRequest method
         Response response = addFriendHandler.handleRequest(apiGatewayEvent, mockContext);
 
-        // Assert the expected result based on your logic
         assertEquals(response, new Response("Friend added successfully."));
     }
 }

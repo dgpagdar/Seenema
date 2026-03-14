@@ -26,24 +26,23 @@ public class AddMoviesToMyListHandler implements RequestHandler<APIGatewayV2HTTP
     public Response handleRequest(APIGatewayV2HTTPEvent input, Context context) {
         RequestBody requestBody = gson.fromJson(input.getBody(), RequestBody.class);
 
-        // Check if both username and friendUsername exist
+        // Validate user exists before adding the movie
         if (userExists(requestBody.getUsername())) {
 
-            // Add a movie for the main user
+            // Add the movie to the user's list
             addMovieToMyList(requestBody.getUsername(), requestBody.getmovieId());
 
-            // Log success or handle response accordingly
-            context.getLogger().log("Movie added successfully.");
+            context.getLogger().log(String.format("Movie %s added to list for user %s.",
+                    requestBody.getmovieId(), requestBody.getUsername()));
 
-            // Return a response if needed
             return new Response("Movie added successfully.");
         } else {
-            context.getLogger().log("username does not exist in the DynamoDB table.");
+            context.getLogger().log(String.format("Failed to add movie: user %s not found.", requestBody.getUsername()));
             return new Response("username does not exist in the DynamoDB table.");
         }
     }
 
-    // Helper method to check if a user exists in the DynamoDB table
+    // Returns true if a user record exists in DynamoDB for the given email
     private boolean userExists(String email) {
         GetItemResponse getItemResponse = dynamoDbClient.getItem(GetItemRequest.builder()
                 .tableName(Constants.DYNAMODB_TABLE)
@@ -53,13 +52,10 @@ public class AddMoviesToMyListHandler implements RequestHandler<APIGatewayV2HTTP
         return getItemResponse.hasItem();
     }
 
-    // Common function to add a movie for a user
+    // Appends movieId to the Movies set of the given user
     private void addMovieToMyList(String username, String movieId) {
         Map<String, AttributeValue> key = new HashMap<>();
         key.put("Email", AttributeValue.builder().s(username).build());
-
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":movie", AttributeValue.builder().ss(movieId).build());
 
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                 .tableName(Constants.DYNAMODB_TABLE)

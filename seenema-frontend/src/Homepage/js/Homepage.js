@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import Header from './Header';
 import MovieList from "./MovieList";
 import "../css/Homepage.css"
@@ -6,7 +6,7 @@ import "../../App.css"
 import Sidebar from "./Sidebar";
 import {useNavigate, useParams} from 'react-router-dom';
 
-// Defining homepage component as a functional component
+// Homepage composes the Header, Sidebar, and MovieList into the main layout
 function Homepage() {
     const [searchValue, setSearchValue] = useState('');
     const [showSearchFlag, setShowSearchFlag] = useState(false);

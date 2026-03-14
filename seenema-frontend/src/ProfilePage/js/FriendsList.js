@@ -1,6 +1,6 @@
 import "../css/UserProfilePage.css";
 
-// Component representing the list of friends for a user
+// Renders the current user's friends as a styled list
 const FriendsList = ({friendsList}) => {
     return (
         <div>

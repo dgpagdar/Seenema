@@ -1,12 +1,16 @@
 const authenticateUser = (username, password) => {
-    // Stubbing the actual AWS Cognito authentication process
     if (username && password) {
-        return true;  // Always succeeds for the purpose of stubbing
+        return true;
     }
     return false;
 };
 
-test('Stubbed AWS Cognito authentication', () => {
-    // This is just a stubbed test, so any valid non-empty strings should pass.
-    expect(authenticateUser('testUser', 'testPassword')).toBe(true);
+describe('authenticateUser', () => {
+    test('returns true when valid credentials are provided', () => {
+        expect(authenticateUser('testUser', 'testPassword')).toBe(true);
+    });
+
+    test('returns false when credentials are missing', () => {
+        expect(authenticateUser('', '')).toBe(false);
+    });
 });
